@@ -11,12 +11,13 @@ const state = {
   baseFrequencyHz: 0.75,
   speedMultiplier: 1.0,
   acceleratedMode: false,
-  isOscillating: false,
+  isOscillating: true,
   elapsedS: 0,
   rightMirrorVelocityPxS: 0,
   gapPx: 320,
   brightness: 0,
   accelerationFactor: 1,
+  emissionRate: 0,
 };
 
 const unitScale = {
@@ -24,20 +25,15 @@ const unitScale = {
 };
 
 const scene = {
+  mirrorWidth: 24,
+  mirrorHeight: 290,
   leftMirrorX: 210,
-  mirrorThickness: 18,
-  mirrorHeight: 250,
-  centerY: 195,
+  centerY: 270,
+  cavityHeight: 200,
 };
 
-const palette = {
-  bgTop: [8, 12, 28],
-  bgBottom: [4, 7, 18],
-  starA: [180, 205, 255],
-  starB: [250, 250, 255],
-  cavity: [124, 152, 255],
-  photon: [255, 232, 136],
-};
+const photonTrail = [];
+const MAX_PHOTONS = 190;
 
 function setup() {
   const controlsParent = select("#controls");
@@ -47,30 +43,30 @@ function setup() {
     startStopButton.mousePressed(toggleOscillation);
   });
 
-  createControlRow(controlsParent, "Modo de movimiento", (row) => {
+  createControlRow(controlsParent, "Modo", (row) => {
     acceleratedSelect = createSelect().parent(row);
-    acceleratedSelect.option("No acelerado (frecuencia constante)", "no");
-    acceleratedSelect.option("Acelerado (la frecuencia aumenta)", "yes");
+    acceleratedSelect.option("No acelerado", "no");
+    acceleratedSelect.option("Acelerado", "yes");
     acceleratedSelect.changed(() => {
       state.acceleratedMode = acceleratedSelect.value() === "yes";
       state.elapsedS = 0;
     });
   });
 
-  createControlRow(controlsParent, "Multiplicador de rapidez", (row) => {
+  createControlRow(controlsParent, "Rapidez", (row) => {
     speedSlider = createSlider(0.6, 3.0, state.speedMultiplier, 0.1).parent(row);
   });
 
-  metricRefs.state = document.getElementById("m-state");
   metricRefs.mode = document.getElementById("m-mode");
   metricRefs.gap = document.getElementById("m-gap");
-  metricRefs.speed = document.getElementById("m-speed");
   metricRefs.freq = document.getElementById("m-freq");
   metricRefs.intensity = document.getElementById("m-intensity");
 
-  const canvas = createCanvas(920, 390);
+  const canvas = createCanvas(920, 540);
   canvas.parent("canvas-wrap");
+
   textFont("Arial");
+  startStopButton.html("Detener oscilación");
 }
 
 function createControlRow(parent, labelText, contentBuilder) {
@@ -85,28 +81,30 @@ function draw() {
 
   updateOscillation(dt);
   drawBackground();
+  drawCavityAndMirrors();
+  drawVacuumWaves();
+  updatePhotons(dt);
   drawPhotons();
-  drawMirrors();
-  drawMeasurement();
+  drawFocusLabels();
   updateMetricsPanel();
 }
 
 function updateOscillation(dt) {
   if (!state.isOscillating) {
+    state.accelerationFactor = 1;
     state.rightMirrorVelocityPxS = 0;
     state.brightness = 0;
+    state.emissionRate = 0;
     state.gapPx = state.baseSeparationPx;
     return;
   }
 
   state.elapsedS += dt;
-
-  const accelerationFactor = state.acceleratedMode
+  state.accelerationFactor = state.acceleratedMode
     ? 1 + Math.min(state.elapsedS * 0.75, 2.5)
     : 1;
-  state.accelerationFactor = accelerationFactor;
 
-  const omega = TWO_PI * state.baseFrequencyHz * state.speedMultiplier * accelerationFactor;
+  const omega = TWO_PI * state.baseFrequencyHz * state.speedMultiplier * state.accelerationFactor;
   const phase = state.elapsedS * omega;
   const displacement = sin(phase) * state.oscillationAmplitudePx;
 
@@ -116,201 +114,174 @@ function updateOscillation(dt) {
     state.maxGapPx
   );
 
-  state.rightMirrorVelocityPxS =
-    cos(phase) * state.oscillationAmplitudePx * omega;
-
-  const speedRatio = constrain(
-    abs(state.rightMirrorVelocityPxS) / 1200,
-    0,
-    1
-  );
+  state.rightMirrorVelocityPxS = cos(phase) * state.oscillationAmplitudePx * omega;
+  const speedRatio = constrain(abs(state.rightMirrorVelocityPxS) / 1200, 0, 1);
   state.brightness = speedRatio;
+  state.emissionRate = speedRatio * (state.acceleratedMode ? 1.35 : 1.0);
+}
+
+function getMirrorPositions() {
+  const leftOuterX = scene.leftMirrorX;
+  const leftInnerX = leftOuterX + scene.mirrorWidth;
+  const rightInnerX = leftInnerX + state.gapPx;
+  const rightOuterX = rightInnerX + scene.mirrorWidth;
+
+  return {
+    leftOuterX,
+    leftInnerX,
+    rightInnerX,
+    rightOuterX,
+    topY: scene.centerY - scene.mirrorHeight / 2,
+    cavityTop: scene.centerY - scene.cavityHeight / 2,
+    cavityBottom: scene.centerY + scene.cavityHeight / 2,
+  };
 }
 
 function drawBackground() {
   const grad = drawingContext.createLinearGradient(0, 0, 0, height);
-  grad.addColorStop(0, `rgb(${palette.bgTop[0]}, ${palette.bgTop[1]}, ${palette.bgTop[2]})`);
-  grad.addColorStop(1, `rgb(${palette.bgBottom[0]}, ${palette.bgBottom[1]}, ${palette.bgBottom[2]})`);
+  grad.addColorStop(0, "#121a3d");
+  grad.addColorStop(1, "#0a1027");
   drawingContext.fillStyle = grad;
+  drawingContext.fillRect(0, 0, width, height);
+
+  const scanAlpha = map(state.brightness, 0, 1, 0.06, 0.14);
   noStroke();
-  rect(0, 0, width, height);
-
-  const voidAlpha = map(state.brightness, 0, 1, 145, 70);
-  fill(0, 0, 0, voidAlpha);
-  rect(0, 0, width, height);
-
-  for (let i = 0; i < 170; i += 1) {
-    const x = (i * 91) % width;
-    const y = (i * 61 + 30) % height;
-    const twinkle = 12 + ((frameCount + i * 9) % 80) / 4;
-    const isA = i % 3 === 0;
-    const c = isA ? palette.starA : palette.starB;
-    fill(c[0], c[1], c[2], twinkle);
-    circle(x, y, isA ? 1.8 : 1.2);
-  }
-
-  if (state.isOscillating) {
-    const vignetteAlpha = map(state.brightness, 0, 1, 12, 42);
-    fill(8, 16, 48, vignetteAlpha);
-    rect(0, 0, width, height);
-  }
+  fill(120, 170, 255, 255 * scanAlpha);
+  rect(0, scene.centerY - 130, width, 260);
 }
 
-function drawMirrors() {
-  const leftX = scene.leftMirrorX;
-  const rightX = leftX + scene.mirrorThickness + state.gapPx;
-  const topY = scene.centerY - scene.mirrorHeight / 2;
+function drawCavityAndMirrors() {
+  const m = getMirrorPositions();
+  const glowAlpha = map(state.brightness, 0, 1, 35, 170);
 
-  drawCavityGlow(leftX + scene.mirrorThickness, rightX, topY);
+  noStroke();
+  fill(118, 182, 255, glowAlpha);
+  rect(m.leftInnerX, m.cavityTop, state.gapPx, scene.cavityHeight, 9);
 
-  fill(146, 172, 238);
-  stroke(225, 237, 255, state.isOscillating ? 255 : 210);
+  noFill();
+  stroke(152, 206, 255, 190);
   strokeWeight(2);
-  rect(leftX, topY, scene.mirrorThickness, scene.mirrorHeight, 3);
-  rect(rightX, topY, scene.mirrorThickness, scene.mirrorHeight, 3);
+  rect(m.leftInnerX, m.cavityTop, state.gapPx, scene.cavityHeight, 9);
 
-  drawMirrorHighlights(leftX, rightX, topY);
+  fill(128, 158, 250);
+  stroke(208, 228, 255, 220);
+  strokeWeight(1.2);
+  rect(m.leftOuterX, m.topY, scene.mirrorWidth, scene.mirrorHeight, 5);
+  rect(m.rightInnerX, m.topY, scene.mirrorWidth, scene.mirrorHeight, 5);
 
   noStroke();
-  fill(238, 243, 255);
+  fill(220, 238, 255, 200);
   textAlign(CENTER, BOTTOM);
-  textSize(12);
-  text("Espejo fijo", leftX + scene.mirrorThickness / 2, topY - 8);
-  text("Espejo oscilante", rightX + scene.mirrorThickness / 2, topY - 8);
+  textSize(13);
+  text("Espejo fijo", m.leftOuterX + scene.mirrorWidth / 2, m.topY - 8);
+  text("Espejo oscilante", m.rightInnerX + scene.mirrorWidth / 2, m.topY - 8);
 }
 
-function drawCavityGlow(leftInnerX, rightInnerX, topY) {
-  const cavityHeight = scene.mirrorHeight;
-  const cavityWidth = rightInnerX - leftInnerX;
-  const intensity = map(state.brightness, 0, 1, 0.07, 0.42);
-  const modeBoost = state.acceleratedMode ? 1.2 : 1.0;
+function drawVacuumWaves() {
+  if (!state.isOscillating) return;
 
-  noStroke();
-  fill(palette.cavity[0], palette.cavity[1], palette.cavity[2], 255 * intensity * modeBoost);
-  rect(leftInnerX, topY, cavityWidth, cavityHeight, 4);
+  const m = getMirrorPositions();
+  const layers = 5;
 
-  fill(184, 210, 255, 28 + intensity * 130);
-  rect(leftInnerX, topY + cavityHeight * 0.18, cavityWidth, cavityHeight * 0.64, 4);
+  for (let i = 0; i < layers; i += 1) {
+    const yBase = map(i, 0, layers - 1, m.cavityTop + 22, m.cavityBottom - 22);
+    const amp = 5 + state.brightness * 15 + i * 1.4;
 
-  if (state.isOscillating) {
     noFill();
-    stroke(123, 176, 255, 45 + state.brightness * 90);
-    strokeWeight(1.4);
-    for (let i = 0; i < 4; i += 1) {
-      const y = topY + cavityHeight * (0.2 + i * 0.2);
-      const phase = frameCount * 0.09 + i;
-      beginShape();
-      for (let x = leftInnerX; x <= rightInnerX; x += 7) {
-        const t = map(x, leftInnerX, rightInnerX, 0, TWO_PI * 2);
-        vertex(x, y + sin(t + phase) * (3 + state.brightness * 7));
-      }
-      endShape();
-    }
-  }
-}
-
-function drawMirrorHighlights(leftX, rightX, topY) {
-  noStroke();
-  fill(255, 255, 255, 55);
-  rect(leftX + 2, topY + 4, 3, scene.mirrorHeight - 8, 2);
-  rect(rightX + 2, topY + 4, 3, scene.mirrorHeight - 8, 2);
-
-  fill(106, 130, 202, 105);
-  rect(leftX + scene.mirrorThickness - 3, topY + 2, 2, scene.mirrorHeight - 4, 2);
-  rect(rightX + scene.mirrorThickness - 3, topY + 2, 2, scene.mirrorHeight - 4, 2);
-}
-
-function drawPhotons() {
-  if (!state.isOscillating) {
-    return;
-  }
-
-  const leftInnerX = scene.leftMirrorX + scene.mirrorThickness;
-  const rightInnerX = leftInnerX + state.gapPx;
-  const photonCount = floor(map(state.brightness, 0, 1, 8, 52));
-  const baseAlpha = map(state.brightness, 0, 1, 30, 220);
-  const waveAmplitude = map(state.brightness, 0, 1, 4, 18);
-  const glowAlpha = map(state.brightness, 0, 1, 10, 120);
-
-  noStroke();
-  fill(255, 218, 124, glowAlpha);
-  ellipse((leftInnerX + rightInnerX) / 2, scene.centerY, state.gapPx * 0.9, scene.mirrorHeight * 0.72);
-
-  for (let i = 0; i < photonCount; i += 1) {
-    const waveOffset = i * 0.4 + frameCount * 0.08;
-    const yCenter = scene.centerY - 95 + (i % 11) * 18;
-
-    const hueBoost = state.acceleratedMode ? 15 : 0;
-    stroke(palette.photon[0], palette.photon[1] + hueBoost, palette.photon[2], baseAlpha);
-    strokeWeight(1.4);
-    noFill();
+    stroke(146, 206, 255, 95 + state.brightness * 120 - i * 10);
+    strokeWeight(1.6);
     beginShape();
-    for (let x = leftInnerX; x <= rightInnerX; x += 6) {
-      const t = map(x, leftInnerX, rightInnerX, 0, TWO_PI * 2.2);
-      const y = yCenter + sin(t + waveOffset) * waveAmplitude;
-      vertex(x, y);
+    for (let x = m.leftInnerX; x <= m.rightInnerX; x += 7) {
+      const t = map(x, m.leftInnerX, m.rightInnerX, 0, TWO_PI * 2.2);
+      const phase = frameCount * 0.075 + i * 0.7;
+      vertex(x, yBase + sin(t + phase) * amp);
     }
     endShape();
   }
-
-  const sparkCount = floor(map(state.brightness, 0, 1, 12, 95));
-  noStroke();
-  for (let i = 0; i < sparkCount; i += 1) {
-    const x = random(leftInnerX + 4, rightInnerX - 4);
-    const y = random(scene.centerY - 95, scene.centerY + 95);
-    const r = random(0.9, 2.9);
-    fill(255, 246, 186, random(70, 210));
-    circle(x, y, r);
-  }
-
-  noFill();
-  const cx = (leftInnerX + rightInnerX) / 2;
-  const wavePulse = frameCount * 0.12;
-  for (let i = 0; i < 3; i += 1) {
-    const ringSize = state.gapPx * (0.44 + i * 0.27) + sin(wavePulse + i) * 10;
-    stroke(142, 196, 255, 42 + state.brightness * 88 - i * 12);
-    strokeWeight(1.2);
-    ellipse(cx, scene.centerY, ringSize, ringSize * 0.45);
-  }
-
-  noStroke();
-  fill(255, 245, 186, 220);
-  textAlign(CENTER, TOP);
-  textSize(12);
-  text("Fluctuaciones del vacío → fotones efectivos", (leftInnerX + rightInnerX) / 2, scene.centerY + 103);
 }
 
-function drawMeasurement() {
-  const leftInnerX = scene.leftMirrorX + scene.mirrorThickness;
-  const rightInnerX = leftInnerX + state.gapPx;
-  const y = scene.centerY + 130;
+function updatePhotons(dt) {
+  const m = getMirrorPositions();
+  const spawnRate = map(state.emissionRate, 0, 1.35, 8, 95);
+  const toSpawn = state.isOscillating ? floor(spawnRate * dt * 10) : 0;
 
-  stroke(245);
+  for (let i = 0; i < toSpawn; i += 1) {
+    if (photonTrail.length >= MAX_PHOTONS) photonTrail.shift();
+    photonTrail.push({
+      x: random(m.leftInnerX + 8, m.rightInnerX - 8),
+      y: random(m.cavityTop + 10, m.cavityBottom - 10),
+      vx: random(-22, 22),
+      vy: random(-18, 18),
+      life: random(0.5, 1.2),
+      ttl: random(0.5, 1.2),
+      r: random(1.7, 3.8),
+    });
+  }
+
+  for (let i = photonTrail.length - 1; i >= 0; i -= 1) {
+    const p = photonTrail[i];
+    p.life -= dt;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+
+    const insideX = p.x > m.leftInnerX + 2 && p.x < m.rightInnerX - 2;
+    const insideY = p.y > m.cavityTop + 2 && p.y < m.cavityBottom - 2;
+    if (!insideX || !insideY || p.life <= 0) {
+      photonTrail.splice(i, 1);
+    }
+  }
+}
+
+function drawPhotons() {
+  const m = getMirrorPositions();
+
+  const coreAlpha = map(state.emissionRate, 0, 1.35, 40, 220);
+  noStroke();
+  fill(255, 226, 132, coreAlpha);
+  ellipse((m.leftInnerX + m.rightInnerX) / 2, scene.centerY, 58 + state.brightness * 66);
+
+  for (let i = 0; i < photonTrail.length; i += 1) {
+    const p = photonTrail[i];
+    const alpha = map(p.life / p.ttl, 0, 1, 0, 220);
+    fill(255, 245, 190, alpha);
+    ellipse(p.x, p.y, p.r * 2);
+  }
+}
+
+function drawFocusLabels() {
+  const m = getMirrorPositions();
+  const gapMicrometers = pixelsToMeters(state.gapPx) * 1e6;
+  const modeText = state.acceleratedMode ? "Modo acelerado" : "Modo no acelerado";
+  const modeColor = state.acceleratedMode ? [255, 226, 146] : [178, 211, 255];
+
+  stroke(235, 242, 255, 210);
   strokeWeight(1.3);
-  line(leftInnerX, y, rightInnerX, y);
-  line(leftInnerX, y - 7, leftInnerX, y + 7);
-  line(rightInnerX, y - 7, rightInnerX, y + 7);
+  const lineY = m.cavityBottom + 28;
+  line(m.leftInnerX, lineY, m.rightInnerX, lineY);
+  line(m.leftInnerX, lineY - 7, m.leftInnerX, lineY + 7);
+  line(m.rightInnerX, lineY - 7, m.rightInnerX, lineY + 7);
 
   noStroke();
-  fill(255);
+  fill(240, 247, 255, 230);
   textAlign(CENTER, BOTTOM);
-  textSize(13);
-  const gapMicrometers = pixelsToMeters(state.gapPx) * 1e6;
-  text(`Separación de cavidad ≈ ${gapMicrometers.toFixed(3)} µm`, (leftInnerX + rightInnerX) / 2, y - 10);
+  textSize(12);
+  text(`Separación de cavidad ≈ ${gapMicrometers.toFixed(3)} µm`, (m.leftInnerX + m.rightInnerX) / 2, lineY - 10);
+
+  fill(modeColor[0], modeColor[1], modeColor[2], 230);
+  textSize(14);
+  text("Vacío dinámico → luz emergente", width / 2, height - 18);
+  textSize(12);
+  text(modeText, width / 2, height - 2);
 }
 
 function updateMetricsPanel() {
-  const speedMS = abs(pixelsToMeters(state.rightMirrorVelocityPxS));
-  const speedMMs = speedMS * 1e3;
   const gapNm = pixelsToMeters(state.gapPx) * 1e9;
   const effectiveFrequency = state.baseFrequencyHz * state.speedMultiplier * state.accelerationFactor;
 
-  metricRefs.state.textContent = state.isOscillating ? "Oscilando" : "Reposo";
   metricRefs.mode.textContent = state.acceleratedMode ? "Acelerado" : "No acelerado";
   metricRefs.gap.textContent = `${gapNm.toFixed(1)} nm`;
-  metricRefs.speed.textContent = `${speedMMs.toFixed(4)} mm/s`;
   metricRefs.freq.textContent = `${effectiveFrequency.toFixed(2)} Hz`;
-  metricRefs.intensity.textContent = `${state.brightness.toFixed(3)} (adimensional)`;
+  metricRefs.intensity.textContent = `${state.brightness.toFixed(3)}`;
 }
 
 function pixelsToMeters(px) {
@@ -320,5 +291,8 @@ function pixelsToMeters(px) {
 function toggleOscillation() {
   state.isOscillating = !state.isOscillating;
   state.elapsedS = 0;
+  if (!state.isOscillating) {
+    photonTrail.length = 0;
+  }
   startStopButton.html(state.isOscillating ? "Detener oscilación" : "Iniciar oscilación");
 }

@@ -3,52 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Efecto Casimir dinámico - Simulación mínima (p5.js)</title>
+    <title>Casimir dinámico (p5.js)</title>
     <link rel="stylesheet" href="./style.css" />
     <script src="./vendor/p5.min.js"></script>
   </head>
   <body>
     <main class="page">
       <header class="hero">
-        <p class="eyebrow">Simulación didáctica offline · p5.js</p>
-        <h1>Efecto Casimir dinámico: luz emergente en el vacío</h1>
-        <p class="subtitle">
-          Dos espejos forman una cavidad cuántica. Cuando uno oscila, el vacío deja
-          de verse inerte y aparecen ondas/fotones visibles.
-        </p>
+        <h1>Casimir dinámico (p5.js)</h1>
       </header>
 
       <section class="panel controls-panel">
-        <h2>Controles del experimento</h2>
         <div id="controls" class="controls"></div>
-        <p class="scale-note">
-          Escala pedagógica usada: <strong>1 px = 2 nm</strong>. Esta equivalencia
-          sirve para expresar magnitudes en SI de manera intuitiva.
-        </p>
       </section>
 
       <section class="panel visual-panel">
-        <h2>Cavidad y campo de vacío</h2>
         <div id="canvas-wrap" class="canvas-wrap"></div>
       </section>
 
       <section class="panel metrics-panel">
-        <h2>Magnitudes del modelo (SI)</h2>
         <div class="metrics-grid">
-          <article class="metric-card"><span>Estado</span><strong id="m-state">Reposo</strong></article>
           <article class="metric-card"><span>Modo</span><strong id="m-mode">No acelerado</strong></article>
           <article class="metric-card"><span>Separación</span><strong id="m-gap">—</strong></article>
-          <article class="metric-card"><span>Velocidad |v|</span><strong id="m-speed">—</strong></article>
-          <article class="metric-card"><span>Frecuencia efectiva</span><strong id="m-freq">—</strong></article>
-          <article class="metric-card"><span>Intensidad relativa</span><strong id="m-intensity">—</strong></article>
+          <article class="metric-card"><span>Frecuencia</span><strong id="m-freq">—</strong></article>
+          <article class="metric-card"><span>Intensidad</span><strong id="m-intensity">—</strong></article>
         </div>
       </section>
-
-      <p class="note">
-        Este es un modelo mínimo cualitativo: preserva la lógica base del Casimir
-        dinámico (dos espejos, uno oscilante, modo acelerado/no acelerado, intensidad
-        creciente con la rapidez), sin pretender calibración experimental completa.
-      </p>
     </main>
     <script src="./sketch.js"></script>
   </body>
