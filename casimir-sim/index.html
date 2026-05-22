@@ -9,14 +9,45 @@
   </head>
   <body>
     <main class="page">
-      <h1>Efecto Casimir dinámico (modelo mínimo de cavidad)</h1>
-      <p class="subtitle">Dos espejos en vacío: la oscilación puede generar luz visible</p>
-      <div id="controls" class="controls"></div>
-      <div id="canvas-wrap" class="canvas-wrap"></div>
+      <header class="hero">
+        <p class="eyebrow">Simulación didáctica offline · p5.js</p>
+        <h1>Efecto Casimir dinámico: luz emergente en el vacío</h1>
+        <p class="subtitle">
+          Dos espejos forman una cavidad cuántica. Cuando uno oscila, el vacío deja
+          de verse inerte y aparecen ondas/fotones visibles.
+        </p>
+      </header>
+
+      <section class="panel controls-panel">
+        <h2>Controles del experimento</h2>
+        <div id="controls" class="controls"></div>
+        <p class="scale-note">
+          Escala pedagógica usada: <strong>1 px = 2 nm</strong>. Esta equivalencia
+          sirve para expresar magnitudes en SI de manera intuitiva.
+        </p>
+      </section>
+
+      <section class="panel visual-panel">
+        <h2>Cavidad y campo de vacío</h2>
+        <div id="canvas-wrap" class="canvas-wrap"></div>
+      </section>
+
+      <section class="panel metrics-panel">
+        <h2>Magnitudes del modelo (SI)</h2>
+        <div class="metrics-grid">
+          <article class="metric-card"><span>Estado</span><strong id="m-state">Reposo</strong></article>
+          <article class="metric-card"><span>Modo</span><strong id="m-mode">No acelerado</strong></article>
+          <article class="metric-card"><span>Separación</span><strong id="m-gap">—</strong></article>
+          <article class="metric-card"><span>Velocidad |v|</span><strong id="m-speed">—</strong></article>
+          <article class="metric-card"><span>Frecuencia efectiva</span><strong id="m-freq">—</strong></article>
+          <article class="metric-card"><span>Intensidad relativa</span><strong id="m-intensity">—</strong></article>
+        </div>
+      </section>
+
       <p class="note">
-        Modelo: un espejo permanece fijo y el otro oscila. Durante la oscilación,
-        aparecen fotones/ondas entre los espejos. Una mayor rapidez de oscilación
-        produce mayor intensidad visual.
+        Este es un modelo mínimo cualitativo: preserva la lógica base del Casimir
+        dinámico (dos espejos, uno oscilante, modo acelerado/no acelerado, intensidad
+        creciente con la rapidez), sin pretender calibración experimental completa.
       </p>
     </main>
     <script src="./sketch.js"></script>

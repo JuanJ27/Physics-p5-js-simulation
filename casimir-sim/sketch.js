@@ -1,6 +1,7 @@
 let startStopButton;
 let acceleratedSelect;
 let speedSlider;
+const metricRefs = {};
 
 const state = {
   baseSeparationPx: 320,
@@ -15,6 +16,11 @@ const state = {
   rightMirrorVelocityPxS: 0,
   gapPx: 320,
   brightness: 0,
+  accelerationFactor: 1,
+};
+
+const unitScale = {
+  metersPerPixel: 2e-9,
 };
 
 const scene = {
@@ -55,6 +61,13 @@ function setup() {
     speedSlider = createSlider(0.6, 3.0, state.speedMultiplier, 0.1).parent(row);
   });
 
+  metricRefs.state = document.getElementById("m-state");
+  metricRefs.mode = document.getElementById("m-mode");
+  metricRefs.gap = document.getElementById("m-gap");
+  metricRefs.speed = document.getElementById("m-speed");
+  metricRefs.freq = document.getElementById("m-freq");
+  metricRefs.intensity = document.getElementById("m-intensity");
+
   const canvas = createCanvas(920, 390);
   canvas.parent("canvas-wrap");
   textFont("Arial");
@@ -75,7 +88,7 @@ function draw() {
   drawPhotons();
   drawMirrors();
   drawMeasurement();
-  drawLegend();
+  updateMetricsPanel();
 }
 
 function updateOscillation(dt) {
@@ -91,6 +104,7 @@ function updateOscillation(dt) {
   const accelerationFactor = state.acceleratedMode
     ? 1 + Math.min(state.elapsedS * 0.75, 2.5)
     : 1;
+  state.accelerationFactor = accelerationFactor;
 
   const omega = TWO_PI * state.baseFrequencyHz * state.speedMultiplier * accelerationFactor;
   const phase = state.elapsedS * omega;
@@ -121,10 +135,9 @@ function drawBackground() {
   noStroke();
   rect(0, 0, width, height);
 
-  const pulse = map(sin(frameCount * 0.01), -1, 1, 0.35, 1.0);
-  const glowStrength = map(state.brightness, 0, 1, 18, 74) * pulse;
-  fill(85, 116, 236, 30 + glowStrength * 0.2);
-  circle(width * 0.68, height * 0.15, 320);
+  const voidAlpha = map(state.brightness, 0, 1, 145, 70);
+  fill(0, 0, 0, voidAlpha);
+  rect(0, 0, width, height);
 
   for (let i = 0; i < 170; i += 1) {
     const x = (i * 91) % width;
@@ -134,6 +147,12 @@ function drawBackground() {
     const c = isA ? palette.starA : palette.starB;
     fill(c[0], c[1], c[2], twinkle);
     circle(x, y, isA ? 1.8 : 1.2);
+  }
+
+  if (state.isOscillating) {
+    const vignetteAlpha = map(state.brightness, 0, 1, 12, 42);
+    fill(8, 16, 48, vignetteAlpha);
+    rect(0, 0, width, height);
   }
 }
 
@@ -172,6 +191,22 @@ function drawCavityGlow(leftInnerX, rightInnerX, topY) {
 
   fill(184, 210, 255, 28 + intensity * 130);
   rect(leftInnerX, topY + cavityHeight * 0.18, cavityWidth, cavityHeight * 0.64, 4);
+
+  if (state.isOscillating) {
+    noFill();
+    stroke(123, 176, 255, 45 + state.brightness * 90);
+    strokeWeight(1.4);
+    for (let i = 0; i < 4; i += 1) {
+      const y = topY + cavityHeight * (0.2 + i * 0.2);
+      const phase = frameCount * 0.09 + i;
+      beginShape();
+      for (let x = leftInnerX; x <= rightInnerX; x += 7) {
+        const t = map(x, leftInnerX, rightInnerX, 0, TWO_PI * 2);
+        vertex(x, y + sin(t + phase) * (3 + state.brightness * 7));
+      }
+      endShape();
+    }
+  }
 }
 
 function drawMirrorHighlights(leftX, rightX, topY) {
@@ -192,7 +227,7 @@ function drawPhotons() {
 
   const leftInnerX = scene.leftMirrorX + scene.mirrorThickness;
   const rightInnerX = leftInnerX + state.gapPx;
-  const photonCount = floor(map(state.brightness, 0, 1, 5, 40));
+  const photonCount = floor(map(state.brightness, 0, 1, 8, 52));
   const baseAlpha = map(state.brightness, 0, 1, 30, 220);
   const waveAmplitude = map(state.brightness, 0, 1, 4, 18);
   const glowAlpha = map(state.brightness, 0, 1, 10, 120);
@@ -218,11 +253,31 @@ function drawPhotons() {
     endShape();
   }
 
+  const sparkCount = floor(map(state.brightness, 0, 1, 12, 95));
+  noStroke();
+  for (let i = 0; i < sparkCount; i += 1) {
+    const x = random(leftInnerX + 4, rightInnerX - 4);
+    const y = random(scene.centerY - 95, scene.centerY + 95);
+    const r = random(0.9, 2.9);
+    fill(255, 246, 186, random(70, 210));
+    circle(x, y, r);
+  }
+
+  noFill();
+  const cx = (leftInnerX + rightInnerX) / 2;
+  const wavePulse = frameCount * 0.12;
+  for (let i = 0; i < 3; i += 1) {
+    const ringSize = state.gapPx * (0.44 + i * 0.27) + sin(wavePulse + i) * 10;
+    stroke(142, 196, 255, 42 + state.brightness * 88 - i * 12);
+    strokeWeight(1.2);
+    ellipse(cx, scene.centerY, ringSize, ringSize * 0.45);
+  }
+
   noStroke();
   fill(255, 245, 186, 220);
   textAlign(CENTER, TOP);
   textSize(12);
-  text("Luz Casimir dinámica dentro de la cavidad", (leftInnerX + rightInnerX) / 2, scene.centerY + 103);
+  text("Fluctuaciones del vacío → fotones efectivos", (leftInnerX + rightInnerX) / 2, scene.centerY + 103);
 }
 
 function drawMeasurement() {
@@ -240,22 +295,26 @@ function drawMeasurement() {
   fill(255);
   textAlign(CENTER, BOTTOM);
   textSize(13);
-  text(`Separación de cavidad ≈ ${state.gapPx.toFixed(0)} px`, (leftInnerX + rightInnerX) / 2, y - 10);
+  const gapMicrometers = pixelsToMeters(state.gapPx) * 1e6;
+  text(`Separación de cavidad ≈ ${gapMicrometers.toFixed(3)} µm`, (leftInnerX + rightInnerX) / 2, y - 10);
 }
 
-function drawLegend() {
-  const speedAbs = abs(state.rightMirrorVelocityPxS);
+function updateMetricsPanel() {
+  const speedMS = abs(pixelsToMeters(state.rightMirrorVelocityPxS));
+  const speedMMs = speedMS * 1e3;
+  const gapNm = pixelsToMeters(state.gapPx) * 1e9;
+  const effectiveFrequency = state.baseFrequencyHz * state.speedMultiplier * state.accelerationFactor;
 
-  noStroke();
-  fill(240, 246, 255);
-  textAlign(LEFT, TOP);
-  textSize(15);
-  text("Magnitudes del modelo dinámico (cualitativas):", 24, 286);
-  textSize(13);
-  text(`Oscilando: ${state.isOscillating ? "Sí" : "No"}`, 24, 311);
-  text(`Modo: ${state.acceleratedMode ? "Acelerado" : "No acelerado"}`, 24, 330);
-  text(`Rapidez del espejo (|v|): ${speedAbs.toFixed(1)} px/s`, 24, 349);
-  text(`Intensidad de luz (normalizada): ${state.brightness.toFixed(3)}`, 24, 368);
+  metricRefs.state.textContent = state.isOscillating ? "Oscilando" : "Reposo";
+  metricRefs.mode.textContent = state.acceleratedMode ? "Acelerado" : "No acelerado";
+  metricRefs.gap.textContent = `${gapNm.toFixed(1)} nm`;
+  metricRefs.speed.textContent = `${speedMMs.toFixed(4)} mm/s`;
+  metricRefs.freq.textContent = `${effectiveFrequency.toFixed(2)} Hz`;
+  metricRefs.intensity.textContent = `${state.brightness.toFixed(3)} (adimensional)`;
+}
+
+function pixelsToMeters(px) {
+  return px * unitScale.metersPerPixel;
 }
 
 function toggleOscillation() {
