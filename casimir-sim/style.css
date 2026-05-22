@@ -4,32 +4,45 @@
 
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #0f1222;
+  font-family: "Inter", "Segoe UI", Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(1200px 600px at 20% -20%, #2a3370 0%, transparent 45%),
+    radial-gradient(1000px 500px at 100% 0%, #1c2454 0%, transparent 50%),
+    linear-gradient(180deg, #0a1024 0%, #090e1f 100%);
   color: #eef2ff;
 }
 
 .page {
   width: min(980px, 95vw);
   margin: 1.25rem auto 2rem;
+  padding: 1rem 1rem 1.2rem;
+  background: rgba(10, 14, 34, 0.72);
+  border: 1px solid rgba(88, 110, 210, 0.35);
+  border-radius: 16px;
+  box-shadow:
+    0 20px 55px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(4px);
 }
 
 h1 {
   margin: 0;
   font-size: 1.35rem;
+  letter-spacing: 0.01em;
 }
 
 .subtitle {
   margin: 0.25rem 0 1rem;
-  color: #bfc9ff;
+  color: #cdd7ff;
 }
 
 .controls {
   margin-bottom: 0.75rem;
-  padding: 0.65rem 0.85rem;
-  background: #171a30;
-  border: 1px solid #2a2f55;
-  border-radius: 10px;
+  padding: 0.8rem 0.95rem;
+  background: linear-gradient(180deg, rgba(34, 42, 84, 0.58), rgba(21, 27, 56, 0.58));
+  border: 1px solid rgba(124, 145, 255, 0.35);
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
 }
 
 .control-row {
@@ -43,6 +56,7 @@ h1 {
 .control-row label {
   min-width: 210px;
   font-weight: 600;
+  color: #e5ebff;
 }
 
 .controls button,
@@ -51,16 +65,43 @@ h1 {
   cursor: pointer;
 }
 
+.controls button,
+.controls select {
+  border: 1px solid rgba(146, 166, 255, 0.45);
+  border-radius: 8px;
+  background: rgba(14, 20, 49, 0.92);
+  color: #eff3ff;
+  padding: 0.42rem 0.58rem;
+}
+
+.controls button {
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.controls button:hover {
+  transform: translateY(-1px);
+  background: rgba(28, 37, 79, 0.98);
+  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.25);
+}
+
+.controls input[type="range"] {
+  accent-color: #96b4ff;
+}
+
 .canvas-wrap {
-  border: 1px solid #2a2f55;
-  border-radius: 10px;
+  border: 1px solid rgba(123, 143, 245, 0.45);
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow:
+    0 20px 35px rgba(0, 0, 0, 0.38),
+    inset 0 0 30px rgba(150, 180, 255, 0.06);
 }
 
 .note {
   margin-top: 0.75rem;
   font-size: 0.92rem;
-  color: #c9d1ff;
+  color: #cfd7ff;
+  line-height: 1.4;
 }
 
 code {

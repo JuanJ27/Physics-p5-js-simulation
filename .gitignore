@@ -14,7 +14,7 @@ EJEMPLO*
 *.fls
 *.fdb_latexmk
 *.synctex.gz
-*.pdf
+
 
 ## Temporales de editores/SO
 .DS_Store

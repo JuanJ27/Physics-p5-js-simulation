@@ -1,34 +1,34 @@
-# Dynamic Casimir Effect - Minimal p5.js Local Simulation
+# Efecto Casimir dinámico - Simulación local mínima en p5.js
 
-This deliverable is a minimal local visualization of a **dynamic Casimir cavity**:
+Este entregable presenta una visualización local mínima de una **cavidad de efecto Casimir dinámico**:
 
-- two ideal mirrors in vacuum,
-- one fixed mirror and one oscillating mirror,
-- oscillation can generate visible photons/waves between mirrors,
-- faster oscillation leads to stronger visible intensity.
+- dos espejos ideales en vacío,
+- un espejo fijo y un espejo oscilante,
+- la oscilación puede generar fotones/ondas visibles entre los espejos,
+- una oscilación más rápida produce mayor intensidad visible.
 
-## Run locally
+## Ejecución local
 
-Option 1 (quickest):
-- Open `index.html` directly in your browser.
+Opción 1 (más rápida):
+- Abrí `index.html` directamente en tu navegador.
 
-Option 2 (recommended static server):
-- From this folder run:
+Opción 2 (servidor estático recomendado):
+- Desde esta carpeta ejecutá:
   - `python3 -m http.server 8000`
-- Then open `http://localhost:8000`.
+- Luego abrí `http://localhost:8000`.
 
-## Controls
+## Controles
 
-- **Start oscillation / Stop oscillation** toggles mirror motion.
-- **Motion mode** lets you choose:
-  - non-accelerated (constant frequency), or
-  - accelerated (frequency increases over time).
-- **Speed multiplier** changes how fast the oscillation runs.
+- **Iniciar oscilación / Detener oscilación** activa o detiene el movimiento del espejo.
+- **Modo de movimiento** permite elegir:
+  - no acelerado (frecuencia constante), o
+  - acelerado (la frecuencia aumenta con el tiempo).
+- **Multiplicador de rapidez** cambia qué tan rápido oscila el espejo.
 
-## What you should observe
+## Qué deberías observar
 
-- With no oscillation, the cavity stays dark.
-- During oscillation, light-like waves appear between mirrors.
-- Increasing speed increases the visual light intensity.
+- Sin oscilación, la cavidad permanece oscura.
+- Durante la oscilación, aparecen ondas tipo luz entre los espejos.
+- Al aumentar la rapidez, aumenta la intensidad visual de la luz.
 
-> Note: this is a pedagogical qualitative model, not a full experimental simulator.
+> Nota: este es un modelo cualitativo pedagógico, no un simulador experimental completo.
