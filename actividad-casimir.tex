@@ -1,0 +1,100 @@
+\documentclass{aa}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{txfonts}
+
+\begin{document}
+
+\title{Guía de actividad: efecto Casimir dinámico en cavidad}
+
+\subtitle{Exploración con simulación interactiva en p5.js}
+
+\author{Laboratorio de Física}
+
+\institute{Universidad}
+
+\date{2026}
+
+\abstract
+{Esta actividad propone una exploración guiada del efecto Casimir dinámico con dos espejos paralelos, uno fijo y otro oscilante, mediante una simulación interactiva.}
+{Analizar cómo la oscilación del espejo móvil induce aparición de luz en la cavidad y cómo la intensidad crece al aumentar la rapidez del movimiento.}
+{Se compara el modo no acelerado (referencia) con el modo acelerado y se registran distancia, rapidez e intensidad relativa para identificar tendencias.}
+{Se observa emisión débil o nula sin aceleración y crecimiento marcado de la señal cuando aumenta la velocidad de oscilación.}
+{La guía conecta condiciones de borde dependientes del tiempo con generación de fotones a partir del vacío en un entorno didáctico controlado.}
+
+\keywords{efecto Casimir dinámico -- vacío cuántico -- espejos oscilantes -- cavidad -- simulación}
+
+\maketitle
+
+\section{Objetivo}
+
+Estudiar, con apoyo de una simulación interactiva, la dinámica de una cavidad con dos espejos (uno oscilante) para identificar la aparición de luz asociada al efecto Casimir dinámico y su dependencia con la rapidez del movimiento.
+
+\section{Contexto breve}
+
+En el régimen dinámico, el fenómeno relevante no es solo la fuerza estática entre placas, sino la modificación temporal de los modos del campo cuando una frontera se mueve. Si un espejo oscila, la cavidad cambia su longitud efectiva en el tiempo y puede convertir fluctuaciones del vacío en fotones detectables como luz dentro de la cavidad.
+
+En esta actividad se trabaja con una simulación didáctica de dos espejos paralelos: uno fijo y otro móvil. La interfaz permite comparar un modo no acelerado con un modo acelerado para evidenciar cómo cambia la emisión.
+
+\section{Instrucciones de uso de la simulación}
+
+\begin{enumerate}
+  \item Inicie la simulación e identifique los dos espejos de la cavidad (fijo y oscilante).
+  \item Ubique los controles de movimiento del espejo móvil: selector de modo (no acelerado o acelerado), control de rapidez y botón de inicio/detención.
+  \item Observe primero la cavidad en reposo y luego active el modo no acelerado como referencia.
+  \item Registre en una tabla los pares $(v, I/I_{\max})$, donde $v$ representa la rapidez de oscilación e $I/I_{\max}$ la intensidad relativa de luz mostrada.
+  \item Repita el registro en modo acelerado para los mismos valores de rapidez y compare resultados.
+\end{enumerate}
+
+\section{Actividades guiadas}
+
+\subsection{Actividad 1: aparición de luz en cavidad}
+Con separación fija, active primero el modo no acelerado y luego el modo acelerado.
+
+\textbf{Preguntas de análisis}
+\begin{itemize}
+  \item ¿Se observa luz en ambos modos o principalmente en el acelerado?
+  \item ¿Cómo describiría cualitativamente el cambio temporal de brillo al encender la oscilación?
+\end{itemize}
+
+\subsection{Actividad 2: intensidad versus rapidez de oscilación}
+En cada modo, aumente la rapidez del espejo móvil en al menos cinco niveles.
+
+\textbf{Sugerencia de procesamiento}: grafique $I/I_{\max}$ en función de $v$ para modo no acelerado y acelerado.
+
+\textbf{Preguntas de análisis}
+\begin{itemize}
+  \item ¿En qué modo crece más rápido la intensidad al aumentar $v$?
+  \item ¿El crecimiento parece suave, casi lineal o claramente no lineal?
+\end{itemize}
+
+\subsection{Actividad 3: contraste acelerado/no acelerado}
+Para una rapidez intermedia y otra alta, compare directamente ambos modos.
+
+\textbf{Preguntas de análisis}
+\begin{itemize}
+  \item ¿Qué diferencia relativa de intensidad aparece entre ambos modos?
+  \item ¿Qué interpretación física puede proponer para esa diferencia?
+\end{itemize}
+
+\subsection{Actividad 4: alcances y límites del modelo}
+Contraste lo observado con un experimento real de cavidades dinámicas.
+
+\textbf{Preguntas de análisis}
+\begin{itemize}
+  \item Mencione al menos tres efectos físicos no incluidos (pérdidas, detección, ruido, no idealidad de espejos).
+  \item ¿Cómo podrían esos efectos modificar la intensidad de luz estimada en simulación?
+\end{itemize}
+
+\section{Cierre y síntesis}
+
+Redacte una conclusión breve (8--12 líneas) que responda:
+\begin{itemize}
+  \item qué evidencia respalda la aparición de luz en la cavidad cuando el espejo se acelera,
+  \item cómo cambia la intensidad al aumentar la rapidez de oscilación,
+  \item qué limitaciones deben considerarse al extrapolar resultados a un experimento real.
+\end{itemize}
+
+\end{document}

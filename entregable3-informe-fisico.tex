@@ -1,0 +1,93 @@
+\documentclass{aa}
+
+\usepackage{txfonts}
+
+\begin{document}
+
+\title{Efecto Casimir dinámico en cavidad con espejo oscilante}
+
+\subtitle{Informe físico/teórico para la simulación interactiva actual}
+
+\author{Equipo de simulación}
+
+\institute{Proyecto Physics p5.js Simulation}
+
+\date{\today}
+
+\abstract
+{El efecto Casimir dinámico aparece cuando las condiciones de borde electromagnéticas cambian en el tiempo, por ejemplo al oscilar uno de los espejos de una cavidad.}
+{Describir el marco físico mínimo que explica por qué la simulación muestra aparición de luz y aumento de intensidad al incrementar la rapidez del espejo móvil.}
+{Se modela una cavidad de dos espejos paralelos, uno fijo y otro oscilante, y se interpreta la emisión como conversión de fluctuaciones del vacío en fotones reales por modulación temporal de modos.}
+{El escenario sin aceleración funciona como referencia de baja emisión, mientras que el modo acelerado favorece un crecimiento más notorio de la señal luminosa en la cavidad.}
+{El enfoque es pedagógico y no incorpora pérdidas materiales, ruido instrumental ni un tratamiento electrodinámico completo de detección.}
+
+\keywords{efecto Casimir dinámico -- cavidad electromagnética -- espejo oscilante -- creación de fotones}
+
+\maketitle
+
+\section{Introducción}
+
+El caso estático del efecto Casimir describe una fuerza entre fronteras neutras por modificación del espectro de modos del vacío. Sin embargo, la simulación actual representa el régimen dinámico: dos espejos paralelos forman una cavidad y uno de ellos oscila en el tiempo.
+
+Cuando la longitud efectiva de la cavidad se modula, los modos del campo ya no son estacionarios. Esa variación temporal puede amplificar ciertas fluctuaciones y generar fotones reales, observables como luz en la cavidad.
+
+Para una simulación didáctica, este esquema permite conectar una idea cuántica (vacío fluctuante) con un observable macroscópico (intensidad luminosa), sin introducir toda la complejidad experimental.
+
+\section{Modelo físico}
+
+Se considera un modelo mínimo con los siguientes supuestos:
+\begin{itemize}
+  \item dos espejos paralelos ideales (uno fijo y uno móvil);
+  \item oscilación controlada del espejo móvil en torno a una separación media;
+  \item cavidad en vacío y descripción efectiva de la intensidad emitida;
+  \item ausencia de pérdidas, ruido y no idealidades de detección.
+\end{itemize}
+
+Bajo estas hipótesis, la modulación temporal de la frontera móvil modifica las frecuencias de resonancia de la cavidad y habilita procesos efectivos de creación de pares de fotones.
+
+\section{Ecuaciones clave}
+
+Una forma simple de describir la longitud de cavidad es
+\begin{equation}
+L(t)=L_0+\delta L\,\sin(\Omega t),
+\end{equation}
+donde $L_0$ es la separación media, $\delta L$ la amplitud y $\Omega$ la frecuencia de oscilación del espejo móvil.
+
+En un tratamiento efectivo de simulación, la tasa de emisión o intensidad relativa de luz crece con la rapidez de modulación de la frontera. Esto se representa de forma cualitativa como
+\begin{equation}
+I \propto f(v,\Omega,\delta L),
+\end{equation}
+donde $v$ resume la rapidez del espejo móvil y $f$ es creciente en el régimen acelerado.
+
+La comparación central usada en la simulación es
+\begin{equation}
+I_{\mathrm{acelerado}} > I_{\mathrm{no\ acelerado}}.
+\end{equation}
+Esta desigualdad se evalúa manteniendo iguales los parámetros de referencia.
+
+\section{Interpretación para la simulación}
+
+La simulación representa dos espejos y visualiza brillo dentro de la cavidad cuando el espejo móvil oscila. El objetivo didáctico no es una calibración absoluta de potencia, sino observar tendencias robustas:
+intensidad casi nula o baja en referencia no acelerada y crecimiento progresivo de la señal al aumentar la rapidez en modo acelerado.
+
+También se usan magnitudes normalizadas (por ejemplo $I/I_{\max}$) para facilitar comparación entre corridas y evitar sobreinterpretar unidades arbitrarias del entorno gráfico.
+
+\section{Límites del modelo}
+
+Este marco teórico es deliberadamente ideal y tiene límites claros:
+\begin{itemize}
+  \item \textbf{Pérdidas de cavidad:} disipación y acoplos externos reducen emisión observable.
+  \item \textbf{No idealidad del espejo móvil:} amplitud/frecuencia reales no siguen oscilación perfecta.
+  \item \textbf{Detección experimental:} ruido de fondo y sensibilidad instrumental afectan la medida de luz.
+  \item \textbf{Modelo efectivo:} no reemplaza una electrodinámica cuántica completa del sistema abierto.
+\end{itemize}
+
+Por lo tanto, la simulación no debe interpretarse como herramienta de predicción experimental precisa, sino como aproximación conceptual controlada.
+
+\section{Conclusión}
+
+El informe queda alineado con la simulación actual de Casimir dinámico: dos espejos, uno oscilante, aparición de luz en cavidad y aumento de intensidad con rapidez de movimiento.
+La comparación entre modo acelerado y no acelerado cumple el rol pedagógico central, al mostrar cómo fronteras dependientes del tiempo pueden convertir fluctuaciones del vacío en fotones observables.
+Las simplificaciones adoptadas quedan explícitas para evitar extrapolaciones experimentales indebidas.
+
+\end{document}
