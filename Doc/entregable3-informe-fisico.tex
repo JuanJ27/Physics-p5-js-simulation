@@ -1,0 +1,106 @@
+\documentclass{aa}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{txfonts}
+
+\begin{document}
+
+\title{Efecto Casimir dinámico en cavidad con espejo oscilante}
+
+\subtitle{Informe físico/teórico del simulador interactivo en p5.js}
+
+\author{Equipo de simulación}
+
+\institute{Proyecto de simulación de física}
+
+\date{\today}
+
+\abstract
+{El efecto Casimir dinámico describe la creación de fotones cuando una frontera electromagnética varía en el tiempo. En este trabajo se estudia una cavidad con dos espejos paralelos, uno fijo y otro oscilante.}
+{Presentar un fundamento físico análogo al informe de referencia y coherente con la simulación actual, explicando por qué el modo acelerado incrementa la emisión luminosa frente al modo no acelerado.}
+{Se adopta un modelo de cavidad unidimensional con longitud modulada, se escriben las ecuaciones mínimas de frecuencia modal y condición de resonancia paramétrica, y se interpreta la variable de brillo del simulador como intensidad relativa de fotones generados.}
+{La modulación temporal de la cavidad desplaza frecuencias propias y habilita amplificación paramétrica; en consecuencia, la intensidad relativa crece al aumentar la rapidez de oscilación, con mayor respuesta en régimen acelerado.}
+{El alcance es didáctico: no se modelan pérdidas finitas de cavidad, ruido de detección, acoplo detallado con el entorno ni electrodinámica cuántica completa de sistema abierto.}
+
+\keywords{efecto Casimir dinámico -- cavidad electromagnética -- modulación temporal -- resonancia paramétrica -- simulación}
+
+\maketitle
+
+\section{Introducción}
+
+En el efecto Casimir estático, la presencia de fronteras modifica el espectro de modos del vacío y produce una fuerza neta entre placas. En el régimen \emph{dinámico}, la frontera ya no es fija: si un espejo se mueve, cambian en el tiempo las condiciones de contorno del campo electromagnético y puede ocurrir conversión de fluctuaciones del vacío en fotones reales.
+
+La simulación considerada implementa este escenario con dos espejos paralelos (uno fijo y uno móvil). El observable mostrado es el brillo en la cavidad, interpretado como intensidad relativa de emisión. El objetivo del informe es formalizar esa interpretación con un modelo físico mínimo pero riguroso.
+
+\section{Fundamento físico del modelo}
+
+Se considera una cavidad efectiva de una dimensión con longitud temporalmente modulada:
+\begin{equation}
+L(t)=L_0+\delta L\,\sin(\Omega t), \qquad \delta L \ll L_0,
+\end{equation}
+donde $L_0$ es la separación media, $\delta L$ la amplitud de oscilación y $\Omega$ la frecuencia angular de modulación.
+
+Para un modo longitudinal $n$, la frecuencia propia instantánea se aproxima por
+\begin{equation}
+\omega_n(t)\simeq\frac{n\pi c}{L(t)}
+\simeq \omega_{n0}\left(1-\frac{\delta L}{L_0}\sin(\Omega t)\right),
+\qquad
+\omega_{n0}=\frac{n\pi c}{L_0}.
+\end{equation}
+
+Esta dependencia temporal convierte el modo en un oscilador paramétrico. En primera aproximación, la producción de fotones se intensifica cuando la modulación se acerca a condición de resonancia paramétrica,
+\begin{equation}
+\Omega \approx 2\,\omega_{n0},
+\end{equation}
+porque la energía mecánica inyectada por la frontera móvil acopla de forma eficiente con el modo del campo.
+
+\section{Ecuaciones e interpretación observacional}
+
+En una descripción efectiva útil para el simulador, la tasa de generación de fotones del modo dominante puede escribirse de manera cualitativa como función creciente de la rapidez máxima del espejo,
+\begin{equation}
+\dot N_{\gamma}\propto \Phi\!\left(\frac{v_{\max}}{c},\frac{\delta L}{L_0},\Omega,Q\right),
+\end{equation}
+donde $v_{\max}=\Omega\,\delta L$, $Q$ representa la calidad efectiva de cavidad y $\Phi$ crece al aumentar la modulación en el régimen de trabajo.
+
+Como el simulador reporta brillo normalizado, se usa
+\begin{equation}
+I_{\mathrm{rel}}=\frac{I}{I_{\max}}\in[0,1],
+\end{equation}
+de modo que la comparación entre corridas es independiente de unidades gráficas absolutas. Bajo iguales condiciones de referencia, la predicción cualitativa central es
+\begin{equation}
+I_{\mathrm{rel}}^{(\mathrm{acelerado})} > I_{\mathrm{rel}}^{(\mathrm{no\ acelerado})}.
+\end{equation}
+
+\section{Relación directa con la simulación actual}
+
+La correspondencia entre teoría y simulación se resume así:
+\begin{itemize}
+  \item \textbf{Espejo móvil oscilante} $\rightarrow$ condición de borde dependiente del tiempo $L(t)$.
+  \item \textbf{Control de rapidez} $\rightarrow$ aumento de $v_{\max}=\Omega\,\delta L$ y de la eficiencia de bombeo paramétrico.
+  \item \textbf{Modo no acelerado} $\rightarrow$ referencia de baja modulación efectiva y baja emisión.
+  \item \textbf{Modo acelerado} $\rightarrow$ mayor inyección de energía a los modos y crecimiento de $I_{\mathrm{rel}}$.
+\end{itemize}
+
+Por lo tanto, el incremento de brillo mostrado por la interfaz no se interpreta como artefacto visual, sino como representación pedagógica de creación de fotones por modulación temporal de frontera.
+
+\section{Límites y validez del modelo}
+
+El esquema anterior es intencionalmente simplificado. Sus límites principales son:
+\begin{itemize}
+  \item \textbf{Pérdidas y disipación:} una cavidad real tiene fugas y absorción en espejos, lo que reduce señal neta.
+  \item \textbf{No idealidad mecánica:} la oscilación del espejo puede presentar deriva, no linealidad y restricciones de amplitud/frecuencia.
+  \item \textbf{Detección experimental:} ruido térmico y electrónico puede enmascarar fotones débiles.
+  \item \textbf{Modelo efectivo:} no reemplaza un tratamiento completo de electrodinámica cuántica de cavidades abiertas.
+\end{itemize}
+
+En consecuencia, el informe sustenta tendencias físicas (dirección del cambio) y no predicciones metrológicas absolutas.
+
+\section{Conclusiones}
+
+El entregable físico queda alineado con la simulación del efecto Casimir dinámico: una cavidad con un espejo oscilante transforma modulación temporal de frontera en emisión electromagnética efectiva. Las ecuaciones de longitud modulada y frecuencia modal justifican que, al incrementar la rapidez del espejo, aumente la intensidad relativa observada.
+
+La diferencia sistemática entre modo acelerado y no acelerado constituye la evidencia conceptual central del simulador. Al explicitar sus hipótesis y límites, el documento mantiene rigor teórico suficiente para uso académico en contexto didáctico.
+
+\end{document}

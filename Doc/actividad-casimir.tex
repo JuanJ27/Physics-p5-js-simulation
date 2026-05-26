@@ -1,0 +1,127 @@
+\documentclass{aa}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{txfonts}
+
+\begin{document}
+
+\title{Guía de actividad: efecto Casimir dinámico en cavidad}
+
+\subtitle{Exploración con simulación interactiva en p5.js}
+
+\author{Laboratorio de Física}
+
+\institute{Universidad}
+
+\date{2026}
+
+\abstract
+{Esta actividad propone una exploración guiada del efecto Casimir dinámico con dos espejos paralelos, uno fijo y otro oscilante, mediante una simulación interactiva.}
+{Analizar cómo la oscilación del espejo móvil induce aparición de luz en la cavidad y cómo la intensidad crece al aumentar la rapidez del movimiento.}
+{Se compara el modo no acelerado (referencia) con el modo acelerado y se registran distancia, rapidez e intensidad relativa para identificar tendencias.}
+{Se observa emisión débil o nula sin aceleración y crecimiento marcado de la señal cuando aumenta la velocidad de oscilación.}
+{La guía conecta condiciones de borde dependientes del tiempo con generación de fotones a partir del vacío en un entorno didáctico controlado.}
+
+\keywords{efecto Casimir dinámico -- vacío cuántico -- espejos oscilantes -- cavidad -- simulación}
+
+\maketitle
+
+\section{Manual de uso del simulador}
+
+\subsection{Objetivo de la actividad}
+
+Esta actividad busca analizar, con apoyo de una simulación interactiva, cómo la oscilación de un espejo en una cavidad modifica la emisión de luz asociada al efecto Casimir dinámico. En particular, se comparan los modos \emph{No acelerado} y \emph{Acelerado} para estudiar la variación de la intensidad relativa al cambiar la rapidez.
+
+\subsection{Interfaz y controles disponibles}
+
+En la simulación se observan dos espejos paralelos: un \textbf{espejo fijo} y un \textbf{espejo oscilante}. Además, se dispone de los siguientes controles:
+
+\begin{itemize}
+  \item \textbf{Oscilación}: botón para \emph{Iniciar oscilación} o \emph{Detener oscilación}.
+  \item \textbf{Modo}: selector con dos opciones, \emph{No acelerado} y \emph{Acelerado}.
+  \item \textbf{Rapidez}: deslizador para ajustar la rapidez de oscilación del espejo móvil.
+\end{itemize}
+
+La simulación también muestra métricas en tiempo real:
+
+\begin{itemize}
+  \item \textbf{Modo} activo,
+  \item \textbf{Separación de cavidad} (nm),
+  \item \textbf{Frecuencia efectiva} (Hz),
+  \item \textbf{Intensidad relativa} (valor entre 0 y 1).
+\end{itemize}
+
+\subsection{Cómo interpretar lo que se ve}
+
+\begin{itemize}
+  \item El brillo dentro de la cavidad y los puntos luminosos representan la emisión de luz asociada al vacío dinámico.
+  \item Al variar la rapidez, cambian la frecuencia efectiva y la intensidad observada.
+  \item La comparación entre \emph{No acelerado} y \emph{Acelerado} permite identificar si la emisión aumenta de forma apreciable cuando la oscilación se intensifica con el tiempo.
+\end{itemize}
+
+\section{Actividad interactiva sugerida}
+
+\subsection{Instrucciones}
+
+\begin{enumerate}
+  \item Inicie la simulación e identifique los elementos de la escena: espejo fijo, espejo oscilante y panel de métricas.
+  \item Active el modo \emph{No acelerado} y registre datos para al menos cinco valores de rapidez (por ejemplo: 0.8, 1.2, 1.6, 2.0 y 2.4).
+  \item Para cada valor, espere unos segundos y anote: separación de cavidad, frecuencia efectiva e intensidad relativa.
+  \item Repita el mismo barrido de rapidez en modo \emph{Acelerado}.
+  \item Compare ambos conjuntos de datos y, si es posible, realice un gráfico de intensidad relativa en función de la rapidez para cada modo.
+\end{enumerate}
+
+\subsection{Registro de observaciones}
+
+Complete la siguiente tabla (puede ampliarse con más filas):
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+Modo & Rapidez & Separación (nm) & Frecuencia efectiva (Hz) & Intensidad relativa \\
+\hline
+No acelerado & & & & \\
+\hline
+No acelerado & & & & \\
+\hline
+No acelerado & & & & \\
+\hline
+No acelerado & & & & \\
+\hline
+No acelerado & & & & \\
+\hline
+Acelerado & & & & \\
+\hline
+Acelerado & & & & \\
+\hline
+Acelerado & & & & \\
+\hline
+Acelerado & & & & \\
+\hline
+Acelerado & & & & \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Preguntas para el análisis}
+
+\begin{itemize}
+  \item ¿Qué diferencias cualitativas observó en el brillo de la cavidad entre modo \emph{No acelerado} y modo \emph{Acelerado}?
+  \item Al aumentar la rapidez, ¿la intensidad relativa crece de manera similar en ambos modos o uno muestra un incremento más marcado?
+  \item ¿Cómo se relacionan los cambios de frecuencia efectiva con la variación de intensidad observada?
+  \item ¿En qué rango de rapidez se vuelve más clara la diferencia entre ambos modos?
+\end{itemize}
+
+\section{Cierre}
+
+Redacte una síntesis breve (8--12 líneas) que incluya:
+
+\begin{itemize}
+  \item la evidencia principal sobre la emisión de luz en la cavidad,
+  \item la tendencia de la intensidad relativa al variar la rapidez,
+  \item una limitación del modelo simulado respecto de un experimento físico real.
+\end{itemize}
+
+\end{document}

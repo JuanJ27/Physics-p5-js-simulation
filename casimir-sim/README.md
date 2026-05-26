@@ -1,5 +1,11 @@
 # Casimir dinámico (p5.js)
 
+## Archivo único de entrega (formato análogo al ejemplo)
+
+- Archivo: `../entregable1-codigo-p5-casimir.txt`
+- Contiene el código principal p5.js en un solo archivo para revisión/pegado rápido.
+- La versión ejecutable completa (HTML + CSS + JS + p5 local) se mantiene en `casimir-sim/`.
+
 Simulación didáctica local y offline del fenómeno base:
 
 - dos espejos en una cavidad,
