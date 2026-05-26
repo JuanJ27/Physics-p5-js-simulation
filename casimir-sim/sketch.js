@@ -3,6 +3,11 @@ let acceleratedSelect;
 let speedSlider;
 const metricRefs = {};
 
+const domRefs = {
+  controlsParent: null,
+  canvasParentId: "canvas-wrap",
+};
+
 const state = {
   baseSeparationPx: 320,
   minGapPx: 170,
@@ -36,7 +41,8 @@ const photonTrail = [];
 const MAX_PHOTONS = 190;
 
 function setup() {
-  const controlsParent = select("#controls");
+  ensureLayoutFallback();
+  const controlsParent = domRefs.controlsParent;
 
   createControlRow(controlsParent, "Oscilación", (row) => {
     startStopButton = createButton("Iniciar oscilación").parent(row);
@@ -63,14 +69,78 @@ function setup() {
   metricRefs.intensity = document.getElementById("m-intensity");
 
   const canvas = createCanvas(920, 540);
-  canvas.parent("canvas-wrap");
+  canvas.parent(domRefs.canvasParentId);
 
   textFont("Arial");
   startStopButton.html("Detener oscilación");
 }
 
+function ensureLayoutFallback() {
+  const root = document.body;
+  if (!root) return;
+
+  let controls = document.getElementById("controls");
+  let canvasWrap = document.getElementById("canvas-wrap");
+  let metrics = document.getElementById("metrics");
+
+  if (!controls || !canvasWrap || !metrics) {
+    let appRoot = document.getElementById("sim-app-root");
+    if (!appRoot) {
+      appRoot = document.createElement("main");
+      appRoot.id = "sim-app-root";
+      appRoot.style.maxWidth = "980px";
+      appRoot.style.margin = "1rem auto";
+      appRoot.style.padding = "0.75rem";
+      appRoot.style.fontFamily = "Arial, sans-serif";
+      appRoot.style.color = "#e8efff";
+      root.appendChild(appRoot);
+    }
+
+    if (!controls) {
+      controls = document.createElement("section");
+      controls.id = "controls";
+      controls.style.display = "flex";
+      controls.style.flexWrap = "wrap";
+      controls.style.gap = "0.75rem";
+      controls.style.marginBottom = "0.75rem";
+      appRoot.appendChild(controls);
+    }
+
+    if (!canvasWrap) {
+      canvasWrap = document.createElement("section");
+      canvasWrap.id = "canvas-wrap";
+      canvasWrap.style.border = "1px solid rgba(160,190,255,.35)";
+      canvasWrap.style.borderRadius = "0.5rem";
+      canvasWrap.style.overflow = "hidden";
+      appRoot.appendChild(canvasWrap);
+    }
+
+    if (!metrics) {
+      metrics = document.createElement("section");
+      metrics.id = "metrics";
+      metrics.style.display = "grid";
+      metrics.style.gridTemplateColumns = "repeat(4, minmax(120px, 1fr))";
+      metrics.style.gap = "0.5rem";
+      metrics.style.marginTop = "0.75rem";
+
+      metrics.innerHTML = `
+        <div><strong>Modo</strong><div id="m-mode">—</div></div>
+        <div><strong>Gap</strong><div id="m-gap">—</div></div>
+        <div><strong>Frecuencia</strong><div id="m-freq">—</div></div>
+        <div><strong>Intensidad</strong><div id="m-intensity">—</div></div>
+      `;
+
+      appRoot.appendChild(metrics);
+    }
+  }
+
+  domRefs.controlsParent = select("#controls") || createDiv("");
+}
+
 function createControlRow(parent, labelText, contentBuilder) {
-  const row = createDiv("").parent(parent).class("control-row");
+  const row = createDiv("");
+  if (parent) row.parent(parent);
+  row.class("control-row");
   createElement("label", labelText).parent(row);
   contentBuilder(row);
 }
@@ -275,6 +345,10 @@ function drawFocusLabels() {
 }
 
 function updateMetricsPanel() {
+  if (!metricRefs.mode || !metricRefs.gap || !metricRefs.freq || !metricRefs.intensity) {
+    return;
+  }
+
   const gapNm = pixelsToMeters(state.gapPx) * 1e9;
   const effectiveFrequency = state.baseFrequencyHz * state.speedMultiplier * state.accelerationFactor;
 
