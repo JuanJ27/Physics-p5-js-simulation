@@ -1,8 +1,14 @@
-/*
- * ============================================================
- * Entregable 1 — Simulación p5.js del efecto Casimir dinámico
- * ============================================================
- */
+/*************************************************************
+ ******** Efecto casimir dinámico ****************************
+ *************************************************************
+ ** Autor: Juan Jose Montoya Sanchez                        **
+ **        Jose David Ortiz Campo                           **
+ ** Institución: Universidad de Antioquia                   **
+ ** Curso: Laboratorio avanzado 3  2025-1                   **
+ *************************************************************
+ ** Librerías necesarias: p5.js                             **
+ ** Imágenes externas: No requiere imágenes externas        **
+ *************************************************************/
 
 let startStopButton;
 let acceleratedSelect;

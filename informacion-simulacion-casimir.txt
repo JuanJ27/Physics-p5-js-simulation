@@ -1,0 +1,17 @@
+Nombre de la simulación: Casimir dinámico luminoso
+
+Descripción: Simulación p5.js de luz generada en una cavidad de espejos por oscilación dinámica del vacío.
+
+Autores:
+- Juan Jose Montoya Sanchez
+- Jose David Ortiz Campo
+
+Correos electrónicos:
+- juan.montoya110@udea.edu.co
+- jose.ortizc@udea.edu.co 
+
+Librerías necesarias:
+- p5.js
+
+Imágenes externas necesarias:
+- No requiere imágenes externas.
