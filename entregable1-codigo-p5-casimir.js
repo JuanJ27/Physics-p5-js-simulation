@@ -12,7 +12,7 @@
 
 let startStopButton;
 let acceleratedSelect;
-let speedSlider;
+let speedInput;
 const metricRefs = {};
 
 const domRefs = {
@@ -33,8 +33,16 @@ const state = {
   rightMirrorVelocityPxS: 0,
   gapPx: 320,
   brightness: 0,
+  averageBrightness: 0,
   accelerationFactor: 1,
   emissionRate: 0,
+};
+
+// Promedio móvil de intensidad.
+// Se promedia state.brightness durante los últimos 2 segundos.
+const intensityAverage = {
+  windowS: 2.0,
+  samples: [],
 };
 
 // Escala de la simulación:
@@ -70,16 +78,42 @@ function setup() {
     acceleratedSelect.changed(() => {
       state.acceleratedMode = acceleratedSelect.value() === "yes";
       state.elapsedS = 0;
+      resetIntensityAverage();
     });
   });
 
   createControlRow(controlsParent, "Rapidez", (row) => {
-    speedSlider = createSlider(0.6, 3.0, state.speedMultiplier, 0.1).parent(row);
+    const speedBox = createDiv("");
+    speedBox.parent(row);
+    speedBox.style("display", "flex");
+    speedBox.style("flex-direction", "column");
+    speedBox.style("gap", "0.15rem");
+
+    speedInput = createInput(String(state.speedMultiplier), "text");
+    speedInput.parent(speedBox);
+    speedInput.attribute("inputmode", "decimal");
+    speedInput.attribute("placeholder", "Ej: 0.8, 1.2, 1.6, 2.0");
+    speedInput.style("width", "7rem");
+    speedInput.style("padding", "0.25rem 0.4rem");
+
+    speedInput.changed(() => {
+      state.elapsedS = 0;
+      resetIntensityAverage();
+    });
+
+    const hint = createSpan();
+    hint.parent(speedBox);
+    hint.style("font-size", "0.72rem");
+    hint.style("opacity", "0.75");
+    hint.style("line-height", "1.1");
   });
 
   metricRefs.gap = document.getElementById("m-gap");
   metricRefs.freq = document.getElementById("m-freq");
   metricRefs.intensity = document.getElementById("m-intensity");
+
+  // Si el HTML ya existía fuera del fallback, renombra el rótulo también.
+  setMetricLabel("m-intensity", "Intensidad promedio");
 
   const canvas = createCanvas(windowWidth, windowHeight - 90);
   canvas.parent(domRefs.canvasParentId);
@@ -139,7 +173,7 @@ function ensureLayoutFallback() {
       metrics.innerHTML = `
         <div><strong>Separación</strong><div id="m-gap">—</div></div>
         <div><strong>Frecuencia</strong><div id="m-freq">—</div></div>
-        <div><strong>Intensidad</strong><div id="m-intensity">—</div></div>
+        <div><strong>Intensidad promedio</strong><div id="m-intensity">—</div></div>
       `;
 
       appRoot.appendChild(metrics);
@@ -147,6 +181,16 @@ function ensureLayoutFallback() {
   }
 
   domRefs.controlsParent = select("#controls") || createDiv("");
+}
+
+function setMetricLabel(metricValueId, newLabelText) {
+  const valueNode = document.getElementById(metricValueId);
+  if (!valueNode || !valueNode.parentElement) return;
+
+  const labelNode = valueNode.parentElement.querySelector("strong");
+  if (!labelNode) return;
+
+  labelNode.textContent = newLabelText;
 }
 
 function createControlRow(parent, labelText, contentBuilder) {
@@ -159,9 +203,10 @@ function createControlRow(parent, labelText, contentBuilder) {
 
 function draw() {
   const dt = deltaTime / 1000;
-  state.speedMultiplier = speedSlider.value();
+  state.speedMultiplier = readSpeedMultiplier();
 
   updateOscillation(dt);
+  updateIntensityAverage(dt);
   drawBackground();
   drawCavityAndMirrors();
   drawVacuumWaves();
@@ -171,11 +216,33 @@ function draw() {
   updateMetricsPanel();
 }
 
+function readSpeedMultiplier() {
+  if (!speedInput) {
+    return state.speedMultiplier;
+  }
+
+  const rawValue = String(speedInput.value()).trim();
+  const normalizedValue = rawValue.replace(",", ".");
+  const parsedValue = Number(normalizedValue);
+
+  if (rawValue !== "" && Number.isFinite(parsedValue)) {
+    speedInput.style("border", "");
+    speedInput.attribute("title", "Rapidez usada en la simulación");
+    return parsedValue;
+  }
+
+  speedInput.style("border", "1px solid rgba(255, 120, 120, 0.95)");
+  speedInput.attribute("title", "Ingrese un número decimal válido. Ejemplo: 1.2");
+
+  return state.speedMultiplier;
+}
+
 function updateOscillation(dt) {
   if (!state.isOscillating) {
     state.accelerationFactor = 1;
     state.rightMirrorVelocityPxS = 0;
     state.brightness = 0;
+    state.averageBrightness = 0;
     state.emissionRate = 0;
     state.gapPx = state.baseSeparationPx;
     return;
@@ -201,6 +268,44 @@ function updateOscillation(dt) {
   const speedRatio = constrain(abs(state.rightMirrorVelocityPxS) / 1200, 0, 1);
   state.brightness = speedRatio;
   state.emissionRate = speedRatio * (state.acceleratedMode ? 1.35 : 1.0);
+}
+
+function updateIntensityAverage(dt) {
+  if (!state.isOscillating) {
+    resetIntensityAverage();
+    state.averageBrightness = 0;
+    return;
+  }
+
+  intensityAverage.samples.push({
+    t: state.elapsedS,
+    value: state.brightness,
+  });
+
+  const minTime = state.elapsedS - intensityAverage.windowS;
+  while (
+    intensityAverage.samples.length > 0 &&
+    intensityAverage.samples[0].t < minTime
+  ) {
+    intensityAverage.samples.shift();
+  }
+
+  if (intensityAverage.samples.length === 0) {
+    state.averageBrightness = state.brightness;
+    return;
+  }
+
+  let sum = 0;
+  for (let i = 0; i < intensityAverage.samples.length; i += 1) {
+    sum += intensityAverage.samples[i].value;
+  }
+
+  state.averageBrightness = sum / intensityAverage.samples.length;
+}
+
+function resetIntensityAverage() {
+  intensityAverage.samples.length = 0;
+  state.averageBrightness = 0;
 }
 
 function getMirrorPositions() {
@@ -341,7 +446,6 @@ function drawFocusLabels() {
   fill(240, 247, 255, 230);
   textAlign(CENTER, BOTTOM);
   textSize(12);
-  
 
   fill(modeColor[0], modeColor[1], modeColor[2], 230);
   textSize(14);
@@ -361,7 +465,7 @@ function updateMetricsPanel() {
 
   metricRefs.gap.textContent = `${gapNm.toFixed(1)} nm`;
   metricRefs.freq.textContent = `${effectiveFrequency.toFixed(2)} Hz`;
-  metricRefs.intensity.textContent = `${state.brightness.toFixed(3)}`;
+  metricRefs.intensity.textContent = `${state.averageBrightness.toFixed(3)}`;
 }
 
 function pixelsToNanometers(px) {
@@ -371,6 +475,7 @@ function pixelsToNanometers(px) {
 function toggleOscillation() {
   state.isOscillating = !state.isOscillating;
   state.elapsedS = 0;
+  resetIntensityAverage();
 
   if (!state.isOscillating) {
     photonTrail.length = 0;

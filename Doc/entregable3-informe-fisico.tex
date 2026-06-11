@@ -11,32 +11,33 @@
 
 \subtitle{Informe físico/teórico del simulador interactivo en p5.js}
 
-\author{Equipo de simulación}
+\author{Juan Jose Montoya Sanchez, Jose David Ortiz Campo}
 
-\institute{Proyecto de simulación de física}
+\institute{Instituto de física de la Universidad de Antioquia, Medellín, Colombia}
 
 \date{\today}
 
+\maketitle
+
 \abstract
 {El efecto Casimir dinámico describe la creación de fotones cuando una frontera electromagnética varía en el tiempo. En este trabajo se estudia una cavidad con dos espejos paralelos, uno fijo y otro oscilante.}
-{Presentar un fundamento físico análogo al informe de referencia y coherente con la simulación actual, explicando por qué el modo acelerado incrementa la emisión luminosa frente al modo no acelerado.}
+{Presentar un fundamento físico análogo al informe de referencia y coherente con la simulación actual, explicando por qué el modo acelerado representa una modulación más eficiente y puede incrementar la emisión luminosa frente al modo no acelerado.}
 {Se adopta un modelo de cavidad unidimensional con longitud modulada, se escriben las ecuaciones mínimas de frecuencia modal y condición de resonancia paramétrica, y se interpreta la variable de brillo del simulador como intensidad relativa de fotones generados.}
 {La modulación temporal de la cavidad desplaza frecuencias propias y habilita amplificación paramétrica; en consecuencia, la intensidad relativa crece al aumentar la rapidez de oscilación, con mayor respuesta en régimen acelerado.}
 {El alcance es didáctico: no se modelan pérdidas finitas de cavidad, ruido de detección, acoplo detallado con el entorno ni electrodinámica cuántica completa de sistema abierto.}
 
 \keywords{efecto Casimir dinámico -- cavidad electromagnética -- modulación temporal -- resonancia paramétrica -- simulación}
 
-\maketitle
 
 \section{Introducción}
 
-En el efecto Casimir estático, la presencia de fronteras modifica el espectro de modos del vacío y produce una fuerza neta entre placas. En el régimen \emph{dinámico}, la frontera ya no es fija: si un espejo se mueve, cambian en el tiempo las condiciones de contorno del campo electromagnético y puede ocurrir conversión de fluctuaciones del vacío en fotones reales.
+En el efecto Casimir estático, la presencia de fronteras modifica el espectro de modos del vacío y produce una fuerza neta entre placas \cite{casimir1948}. En el régimen \emph{dinámico}, la frontera ya no es fija: si un espejo se mueve, cambian en el tiempo las condiciones de contorno del campo electromagnético y puede ocurrir conversión de fluctuaciones del vacío en fotones reales \cite{moore1970,nation2012}.
 
 La simulación considerada implementa este escenario con dos espejos paralelos (uno fijo y uno móvil). El observable mostrado es el brillo en la cavidad, interpretado como intensidad relativa de emisión. El objetivo del informe es formalizar esa interpretación con un modelo físico mínimo pero riguroso.
 
 \section{Fundamento físico del modelo}
 
-Se considera una cavidad efectiva de una dimensión con longitud temporalmente modulada:
+Se considera una cavidad efectiva de una dimensión con longitud temporalmente modulada, siguiendo la descripción usual de campos en cavidades de longitud variable y con espejos móviles \cite{moore1970,law1994}:
 \begin{equation}
 L(t)=L_0+\delta L\,\sin(\Omega t), \qquad \delta L \ll L_0,
 \end{equation}
@@ -50,15 +51,15 @@ Para un modo longitudinal $n$, la frecuencia propia instantánea se aproxima por
 \omega_{n0}=\frac{n\pi c}{L_0}.
 \end{equation}
 
-Esta dependencia temporal convierte el modo en un oscilador paramétrico. En primera aproximación, la producción de fotones se intensifica cuando la modulación se acerca a condición de resonancia paramétrica,
+Esta dependencia temporal convierte el modo en un oscilador paramétrico. En esta descripción, la dinámica del campo puede escribirse mediante un Hamiltoniano efectivo cuadrático, lo que permite interpretar la excitación del vacío como creación de pares de fotones \cite{law1994}. En primera aproximación, la producción de fotones se intensifica cuando la modulación se acerca a condición de resonancia paramétrica,
 \begin{equation}
 \Omega \approx 2\,\omega_{n0},
 \end{equation}
-porque la energía mecánica inyectada por la frontera móvil acopla de forma eficiente con el modo del campo.
+porque la energía mecánica inyectada por la frontera móvil acopla de forma eficiente con el modo del campo \cite{dodonov1996,nation2012}.
 
 \section{Ecuaciones e interpretación observacional}
 
-En una descripción efectiva útil para el simulador, la tasa de generación de fotones del modo dominante puede escribirse de manera cualitativa como función creciente de la rapidez máxima del espejo,
+En una descripción efectiva útil para el simulador, la tasa de generación de fotones del modo dominante puede escribirse de manera cualitativa como función creciente de la rapidez máxima del espejo, especialmente en el régimen de modulación resonante o casi resonante \cite{law1994,dodonov1996,nation2012}:
 \begin{equation}
 \dot N_{\gamma}\propto \Phi\!\left(\frac{v_{\max}}{c},\frac{\delta L}{L_0},\Omega,Q\right),
 \end{equation}
@@ -73,6 +74,8 @@ de modo que la comparación entre corridas es independiente de unidades gráfica
 I_{\mathrm{rel}}^{(\mathrm{acelerado})} > I_{\mathrm{rel}}^{(\mathrm{no\ acelerado})}.
 \end{equation}
 
+Esta identificación del brillo con una intensidad relativa de emisión es didáctica, pero es coherente con la interpretación física del efecto Casimir dinámico como generación de fotones reales a partir de una frontera electromagnética dependiente del tiempo \cite{wilson2011,nation2012}.
+
 \section{Relación directa con la simulación actual}
 
 La correspondencia entre teoría y simulación se resume así:
@@ -83,7 +86,7 @@ La correspondencia entre teoría y simulación se resume así:
   \item \textbf{Modo acelerado} $\rightarrow$ mayor inyección de energía a los modos y crecimiento de $I_{\mathrm{rel}}$.
 \end{itemize}
 
-Por lo tanto, el incremento de brillo mostrado por la interfaz no se interpreta como artefacto visual, sino como representación pedagógica de creación de fotones por modulación temporal de frontera.
+Por lo tanto, el incremento de brillo mostrado por la interfaz no se interpreta como artefacto visual, sino como representación pedagógica de creación de fotones por modulación temporal de frontera. La interpretación es especialmente adecuada cuando el modo acelerado representa una variación más rápida o más cercana a la condición de resonancia paramétrica \cite{dodonov1996,law1994}.
 
 \section{Límites y validez del modelo}
 
@@ -95,12 +98,46 @@ El esquema anterior es intencionalmente simplificado. Sus límites principales s
   \item \textbf{Modelo efectivo:} no reemplaza un tratamiento completo de electrodinámica cuántica de cavidades abiertas.
 \end{itemize}
 
-En consecuencia, el informe sustenta tendencias físicas (dirección del cambio) y no predicciones metrológicas absolutas.
+En consecuencia, el informe sustenta tendencias físicas (dirección del cambio) y no predicciones metrológicas absolutas. Esta separación entre modelo ideal, simulación didáctica y realización experimental es importante, porque las observaciones reales del efecto requieren sistemas capaces de producir una modulación efectiva suficientemente rápida de la frontera electromagnética \cite{wilson2011,nation2012}.
 
 \section{Conclusiones}
 
 El entregable físico queda alineado con la simulación del efecto Casimir dinámico: una cavidad con un espejo oscilante transforma modulación temporal de frontera en emisión electromagnética efectiva. Las ecuaciones de longitud modulada y frecuencia modal justifican que, al incrementar la rapidez del espejo, aumente la intensidad relativa observada.
 
 La diferencia sistemática entre modo acelerado y no acelerado constituye la evidencia conceptual central del simulador. Al explicitar sus hipótesis y límites, el documento mantiene rigor teórico suficiente para uso académico en contexto didáctico.
+
+\begin{thebibliography}{}
+
+\bibitem[Casimir(1948)]{casimir1948}
+Casimir, H.~B.~G. 1948,
+On the attraction between two perfectly conducting plates,
+Proceedings of the Koninklijke Nederlandse Akademie van Wetenschappen, 51, 793--795.
+
+\bibitem[Moore(1970)]{moore1970}
+Moore, G.~T. 1970,
+Quantum theory of the electromagnetic field in a variable-length one-dimensional cavity,
+Journal of Mathematical Physics, 11, 2679--2691.
+
+\bibitem[Law(1994)]{law1994}
+Law, C.~K. 1994,
+Effective Hamiltonian for the radiation in a cavity with a moving mirror and a time-varying dielectric medium,
+Physical Review A, 49, 433--437.
+
+\bibitem[Dodonov \& Klimov(1996)]{dodonov1996}
+Dodonov, V.~V., \& Klimov, A.~B. 1996,
+Generation and detection of photons in a cavity with a resonantly oscillating boundary,
+Physical Review A, 53, 2664--2682.
+
+\bibitem[Nation et al.(2012)]{nation2012}
+Nation, P.~D., Johansson, J.~R., Blencowe, M.~P., \& Nori, F. 2012,
+Colloquium: Stimulating uncertainty: Amplifying the quantum vacuum with superconducting circuits,
+Reviews of Modern Physics, 84, 1--24.
+
+\bibitem[Wilson et al.(2011)]{wilson2011}
+Wilson, C.~M., Johansson, G., Pourkabirian, A., Simoen, M., Johansson, J.~R., Duty, T., Nori, F., \& Delsing, P. 2011,
+Observation of the dynamical Casimir effect in a superconducting circuit,
+Nature, 479, 376--379.
+
+\end{thebibliography}
 
 \end{document}
