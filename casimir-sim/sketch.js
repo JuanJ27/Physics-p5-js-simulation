@@ -21,8 +21,15 @@ const state = {
   rightMirrorVelocityPxS: 0,
   gapPx: 320,
   brightness: 0,
+  intensityIndex: 0,
   accelerationFactor: 1,
   emissionRate: 0,
+};
+
+const intensityConfig = {
+  speedMin: 0.6,
+  speedMax: 3.0,
+  acceleratedFactor: 1.35,
 };
 
 const unitScale = {
@@ -164,6 +171,7 @@ function updateOscillation(dt) {
     state.accelerationFactor = 1;
     state.rightMirrorVelocityPxS = 0;
     state.brightness = 0;
+    state.intensityIndex = 0;
     state.emissionRate = 0;
     state.gapPx = state.baseSeparationPx;
     return;
@@ -188,6 +196,26 @@ function updateOscillation(dt) {
   const speedRatio = constrain(abs(state.rightMirrorVelocityPxS) / 1200, 0, 1);
   state.brightness = speedRatio;
   state.emissionRate = speedRatio * (state.acceleratedMode ? 1.35 : 1.0);
+  state.intensityIndex = computeIntensityIndex();
+}
+
+function computeIntensityIndex() {
+  if (!state.isOscillating) {
+    return 0;
+  }
+
+  const normalizedSpeed = constrain(
+    (state.speedMultiplier - intensityConfig.speedMin) /
+      (intensityConfig.speedMax - intensityConfig.speedMin),
+    0,
+    1
+  );
+
+  const modeFactor = state.acceleratedMode
+    ? intensityConfig.acceleratedFactor
+    : 1;
+
+  return constrain(normalizedSpeed * modeFactor, 0, 1);
 }
 
 function getMirrorPositions() {
@@ -355,7 +383,7 @@ function updateMetricsPanel() {
   metricRefs.mode.textContent = state.acceleratedMode ? "Acelerado" : "No acelerado";
   metricRefs.gap.textContent = `${gapNm.toFixed(1)} nm`;
   metricRefs.freq.textContent = `${effectiveFrequency.toFixed(2)} Hz`;
-  metricRefs.intensity.textContent = `${state.brightness.toFixed(3)}`;
+  metricRefs.intensity.textContent = `${state.intensityIndex.toFixed(3)}`;
 }
 
 function pixelsToMeters(px) {

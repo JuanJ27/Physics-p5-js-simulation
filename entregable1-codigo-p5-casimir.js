@@ -34,15 +34,17 @@ const state = {
   gapPx: 320,
   brightness: 0,
   averageBrightness: 0,
+  intensityIndex: 0,
   accelerationFactor: 1,
   emissionRate: 0,
 };
 
-// Promedio móvil de intensidad.
-// Se promedia state.brightness durante los últimos 2 segundos.
-const intensityAverage = {
-  windowS: 2.0,
-  samples: [],
+// Índice estable de intensidad para registro en la actividad.
+// La animación usa brightness instantáneo; el panel usa este índice estable.
+const intensityConfig = {
+  speedMin: 0.6,
+  speedMax: 3.0,
+  acceleratedFactor: 1.25,
 };
 
 // Escala de la simulación:
@@ -243,6 +245,7 @@ function updateOscillation(dt) {
     state.rightMirrorVelocityPxS = 0;
     state.brightness = 0;
     state.averageBrightness = 0;
+    state.intensityIndex = 0;
     state.emissionRate = 0;
     state.gapPx = state.baseSeparationPx;
     return;
@@ -268,6 +271,7 @@ function updateOscillation(dt) {
   const speedRatio = constrain(abs(state.rightMirrorVelocityPxS) / 1200, 0, 1);
   state.brightness = speedRatio;
   state.emissionRate = speedRatio * (state.acceleratedMode ? 1.35 : 1.0);
+  state.intensityIndex = computeIntensityIndex();
 }
 
 function updateIntensityAverage(dt) {
@@ -277,35 +281,31 @@ function updateIntensityAverage(dt) {
     return;
   }
 
-  intensityAverage.samples.push({
-    t: state.elapsedS,
-    value: state.brightness,
-  });
+  state.averageBrightness = state.intensityIndex;
+}
 
-  const minTime = state.elapsedS - intensityAverage.windowS;
-  while (
-    intensityAverage.samples.length > 0 &&
-    intensityAverage.samples[0].t < minTime
-  ) {
-    intensityAverage.samples.shift();
+function computeIntensityIndex() {
+  if (!state.isOscillating) {
+    return 0;
   }
 
-  if (intensityAverage.samples.length === 0) {
-    state.averageBrightness = state.brightness;
-    return;
-  }
+  const normalizedSpeed = constrain(
+    (state.speedMultiplier - intensityConfig.speedMin) /
+      (intensityConfig.speedMax - intensityConfig.speedMin),
+    0,
+    1
+  );
 
-  let sum = 0;
-  for (let i = 0; i < intensityAverage.samples.length; i += 1) {
-    sum += intensityAverage.samples[i].value;
-  }
+  const modeFactor = state.acceleratedMode
+    ? intensityConfig.acceleratedFactor
+    : 1;
 
-  state.averageBrightness = sum / intensityAverage.samples.length;
+  return constrain(normalizedSpeed * modeFactor, 0, 1);
 }
 
 function resetIntensityAverage() {
-  intensityAverage.samples.length = 0;
   state.averageBrightness = 0;
+  state.intensityIndex = 0;
 }
 
 function getMirrorPositions() {
